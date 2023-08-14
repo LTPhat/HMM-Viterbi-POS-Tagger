@@ -1,6 +1,6 @@
 import numpy as np 
 import string 
-from load_vocab import get_index_vocab
+from load import get_index_vocab
 from utils import *
 # Punctuation characters
 punct = set(string.punctuation)
@@ -8,7 +8,6 @@ punct = set(string.punctuation)
 
 
 def preprocess(vocab, test_words):
-
     origin = []
     processed = []
     print(len(vocab))

@@ -11,7 +11,7 @@ adv_suffix = ["ward", "wards", "wise"]
 
 def assign_unk(token):
     """
-    Assign unknown word tokens
+    Assign unknown word (not in vocab) tokens
     """
     # Digits
     if any(char.isdigit() for char in token):
@@ -60,3 +60,32 @@ def get_word_tag(line, vocab):
             word = assign_unk(word)
         return word, tag
     return None 
+
+def preprocess(vocab, test_words):
+    """
+    Preprocess test corpus
+    """
+    origin = []
+    processed = []
+    print(len(vocab))
+    with open(test_words, "r") as data_file:
+        for _, word in enumerate(data_file):
+            i += 1
+            # End of sentence
+            if not word.split():
+                origin.append(word.strip())
+                word = "--n--"
+                processed.append(word)
+                continue
+
+            # Handle unknown words
+            elif word.strip() not in vocab:
+                origin.append(word.strip())
+                word = assign_unk(word)
+                processed.append(word)
+                continue
+
+            else:
+                origin.append(word.strip())
+                processed.append(word.strip())
+    return origin, processed

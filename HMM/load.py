@@ -3,9 +3,11 @@ import sys
 import os
 
 # Read training corpus
-# with open("./data/WSJ_02-21.pos", 'r') as f:
-#     training_corpus = f.readlines()
-# print(training_corpus[0:5])
+def get_training_corpus(corpus_url):
+    with open(corpus_url, 'r') as f:
+        training_corpus = f.readlines()
+        return training_corpus
+
 
 def get_index_vocab(vocab_txt):
     with open(vocab_txt, 'r') as f:
