@@ -3,6 +3,7 @@ from collections import defaultdict
 from utils import *
 from load import get_index_vocab, get_training_corpus
 import unittest
+import pandas as pd
 
 
 class HMM(object):
@@ -19,7 +20,8 @@ class HMM(object):
         self.emission_matrix = None
         self.training_corpus = training_corpus
         self.vocab = get_index_vocab(vocab_txt)
-        self.alpha = 0.001       # Smoothing coefficient
+        self.alpha = 0.001          # Smoothing coefficient
+        self.states = None          # List of number of possible taggings
 
     def _create_counts(self):
         """
@@ -32,6 +34,8 @@ class HMM(object):
             self.emission_counts[(tag, word)] += 1
             self.tag_counts[tag] += 1
             prev_tag = tag
+        # Assign states
+        self.states = list(sorted(self.tag_counts.keys()))
         return self.transition_counts, self.emission_counts, self.tag_counts
 
 
@@ -46,12 +50,11 @@ class HMM(object):
 
         for i in range(num_tags):
             for j in range(num_tags):
-                count_i = 0
                 count_ij = 0
                 pair_ij = (tag_keys[i], tag_keys[j])
                 # Calculate count(i, j)
                 if pair_ij in self.transition_counts:
-                    count_ij = self.transition_counts[count_ij]
+                    count_ij = self.transition_counts[pair_ij]
                 # Calculate count(i)
                 count_i = self.tag_counts[tag_keys[i]]
                 # Calculate A[i, j]
@@ -59,9 +62,10 @@ class HMM(object):
         self.transition_matrix =  A
         return A
     
+
     def _create_emission_matrix(self):
         """
-        B[tag, word] = (count(tag, word) + alpha) / (count(tag) + alpha * num_tags)
+        B[tag, word] = (count(tag, word) + alpha) / (count(tag) + alpha * num_words)
         """
         tag_keys = sorted(self.tag_counts.keys())
         num_tags = len(self.tag_counts)
@@ -78,82 +82,18 @@ class HMM(object):
                 # Get count(tag)
                 count_i = self.tag_counts[tag_keys[i]]
                 # Calculate B[i, j]
-                B[i, j] = (count_ij + self.alpha ) / (count_i + self.alpha * num_tags)
+                B[i, j] = (count_ij + self.alpha ) / (count_i + self.alpha * num_words)
         self.emission_matrix = B
         return B
-
-
-
-class TestHMM(unittest.TestCase):
-    # def __init__(self):
-    #     super(HMM.self).__init__()
-    # def setUp(self):
-    #     self.vocab = get_index_vocab(self.vocab)
-    def test_create_counts(self):
-        hmm = HMM(vocab_txt=vocab, training_corpus=training_corpus)
-        hmm._create_counts()
-        self.assertIsInstance(hmm.emission_counts, defaultdict, msg= "Wrong type of Emissions_counts, expected: Defaultdict")
-        self.assertIsInstance(hmm.transition_counts, defaultdict, msg= "Wrong type of Transition_counts, expected: Defaultdict")
-        self.assertIsInstance(hmm.tag_counts, defaultdict, msg= "Wrong type of Tag_counts, expected: Defaultdict")
-
-        test_cases = [
-        {
-            "name": "default_case",
-            "input": {
-                "training_corpus": self.training_corpus,
-                "vocab": self.vocab,
-                "verbose": False,
-            },
-            "expected": {
-                "len_emission_counts": 31140,
-                "len_transition_counts": 1421,
-                "len_tag_counts": 46,
-                "emission_counts": {
-                    ("DT", "the"): 41098,
-                    ("NNP", "--unk_upper--"): 4635,
-                    ("NNS", "Arts"): 2,
-                },
-                "transition_counts": {
-                    ("VBN", "TO"): 2142,
-                    ("CC", "IN"): 1227,
-                    ("VBN", "JJR"): 66,
-                },
-                "tag_counts": {"PRP": 17436, "UH": 97, ")": 1376,},
-            },
-        },
-        {
-            "name": "small_case",
-            "input": {
-                "training_corpus": self.training_corpus[:1000],
-                "vocab": self.vocab,
-                "verbose": False,
-            },
-            "expected": {
-                "len_emission_counts": 442,
-                "len_transition_counts": 272,
-                "len_tag_counts": 38,
-                "emission_counts": {
-                    ("DT", "the"): 48,
-                    ("NNP", "--unk_upper--"): 9,
-                    ("NNS", "Arts"): 1,
-                },
-                "transition_counts": {
-                    ("VBN", "TO"): 3,
-                    ("CC", "IN"): 2,
-                    ("VBN", "JJR"): 1,
-                },
-                "tag_counts": {"PRP": 11, "UH": 0, ")": 2,},
-                },
-            },
-        ]
-        for test in test_cases:
-            self.assertEqual(len(hmm.transition_counts), test["expected"]["len_transition_counts"], 
-                              msg= "Wrong output values for transition_counts dictionary.\n\t Expected: {}".format(test["expected"]["len_transition_counts"]))
-            # self.assertEqual(len(hmm.emission_counts), test["expected"]["len_emission_counts"], 
-            #                  msg= "Wrong output values for emission_counts dictionary.\n\t Expected: {}".format(test["expected"]["len_emission_counts"]))
-            self.assertEqual(len(hmm.tag_counts), test["expected"]["len_tag_counts"], 
-                             msg= "Wrong output values for tag_counts dictionary.\n\t Expected: {}".format(test["expected"]["len_tag_counts"]))
     
+    def _display_table(self):
+        transition = pd.DataFrame(data=self.transition_matrix, index=self.states, columns=self.states)
+        emission = pd.DataFrame(data=self.emission_matrix, index=self.states, columns = self.vocab.keys())
+        print(transition)
+        print(emission)
+    
+
+
 if __name__ == "__main__":
 
     # unittest.main(verbosity=2)
@@ -161,17 +101,20 @@ if __name__ == "__main__":
     training_corpus = get_training_corpus("./data/WSJ_02-21.pos")
     hmm = HMM(training_corpus=training_corpus, vocab_txt=vocab)
     hmm._create_counts()
-    hmm._create_transition_matrix()
-    print(len(hmm.emission_counts.keys()))
-    print(len(hmm.transition_counts.keys()))
-    print(hmm.tag_counts.keys())
-    states = sorted(hmm.tag_counts.keys())
-    vocab_b = get_index_vocab(vocab)
-    cidx  = ['725','adroitly','engineers', 'promoted', 'synergy']
-    cols = [vocab_b[a] for a in cidx]
-    rvals =['CD','NN','NNS', 'VB','RB','RP']
-    rows = [states.index(a) for a in rvals]
-    print(rows)
-    print(cols)
-    hmm._create_emission_matrix()
-    print(states)
+    A = hmm._create_transition_matrix()
+    B  = hmm._create_emission_matrix()
+    # cidx  = ['725','adroitly','engineers', 'promoted', 'synergy']
+
+    # # Get the integer ID for each word
+    # cols = [hmm.vocab[a] for a in cidx]
+
+    # # Choose POS tags to show in a sample dataframe
+    # rvals =['CD','NN','NNS', 'VB','RB','RP']
+
+    # # For each POS tag, get the row number from the 'states' list
+    # rows = [hmm.states.index(a) for a in rvals]
+    # B_sub = pd.DataFrame(B[np.ix_(rows,cols)], index=rvals, columns = cidx )
+    # print(B_sub)
+    # print(f"View Matrix position at row 0, column 0: {B[0,0]:.9f}")
+    # print(f"View Matrix position at row 3, column 1: {B[3,1]:.9f}")
+    # Testing your function
