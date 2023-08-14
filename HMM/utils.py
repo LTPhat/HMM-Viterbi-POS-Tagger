@@ -1,6 +1,6 @@
 import numpy as np
 import string
-
+from load import *
 punct = set(string.punctuation)
 
 noun_suffix = ["action", "al", "age", "ance", "cy", "dom", "ee", "ence", "er", "hood", "ion", "ism", "ist", "ity", "ling", "ment", "ness", "or", "ry", "scape", "ship", "ty"]
@@ -61,16 +61,14 @@ def get_word_tag(line, vocab):
         return word, tag
     return None 
 
-def preprocess(vocab, test_words):
+def preprocess(vocab, corpus):
     """
     Preprocess test corpus
     """
     origin = []
     processed = []
-    print(len(vocab))
-    with open(test_words, "r") as data_file:
+    with open(corpus, "r") as data_file:
         for _, word in enumerate(data_file):
-            i += 1
             # End of sentence
             if not word.split():
                 origin.append(word.strip())
@@ -89,3 +87,13 @@ def preprocess(vocab, test_words):
                 origin.append(word.strip())
                 processed.append(word.strip())
     return origin, processed
+
+
+if __name__ == "__main__":
+    vocab = "./data/hmm_vocab.txt"
+    test_corpus = "./data/WSJ_24.pos"
+    orgi, processed = preprocess(vocab=get_index_vocab(vocab), corpus = test_corpus)
+    print(len(processed))
+    print(processed[:10])
+    print(orgi[:10])
+    print(list(get_index_vocab(vocab_txt=vocab).items())[:10])
