@@ -7,7 +7,7 @@ import pandas as pd
 
 
 class HMM(object):
-    def __init__(self, vocab_txt, training_corpus):
+    def __init__(self, vocab_txt, training_corpus, alpha):
         """
         emission_counts: maps (tag, word) to the number of times it happened.
         transition_counts[(prev_tag, tag)]: maps (prev_tag, tag) to the number of times it has appeared.
@@ -20,8 +20,8 @@ class HMM(object):
         self.emission_matrix = None
         self.training_corpus = training_corpus
         self.vocab = get_index_vocab(vocab_txt, verbose=False)
-        self.alpha = 0.001          # Smoothing coefficient
-        self.states = None          # List of number of possible taggings
+        self.alpha = alpha          # Smoothing coefficient
+        self.states = list(sorted(self.tag_counts.keys())) # List of number of possible taggings
 
     def _create_counts(self):
         """
@@ -99,10 +99,11 @@ if __name__ == "__main__":
     # unittest.main(verbosity=2)
     vocab = "./data/hmm_vocab.txt"
     training_corpus = get_training_corpus("./data/WSJ_02-21.pos")
-    hmm = HMM(training_corpus=training_corpus, vocab_txt=vocab)
+    hmm = HMM(training_corpus=training_corpus, vocab_txt=vocab, alpha=0.001)
     hmm._create_counts()
     A = hmm._create_transition_matrix()
     B  = hmm._create_emission_matrix()
+    print(B[0:5, 0:5])
     # cidx  = ['725','adroitly','engineers', 'promoted', 'synergy']
 
     # # Get the integer ID for each word
