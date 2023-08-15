@@ -19,7 +19,7 @@ class HMM(object):
         self.transition_matrix = None
         self.emission_matrix = None
         self.training_corpus = training_corpus
-        self.vocab = get_index_vocab(vocab_txt)
+        self.vocab = get_index_vocab(vocab_txt, verbose=False)
         self.alpha = 0.001          # Smoothing coefficient
         self.states = None          # List of number of possible taggings
 
