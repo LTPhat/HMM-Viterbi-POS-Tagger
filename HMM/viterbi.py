@@ -3,6 +3,8 @@ from hmm import HMM
 from load import *
 from utils import *
 import math
+from process_test_corpus import *
+
 
 class Viterbi(object):
     def __init__(self, vocab_txt, tag_counts, transition_matrix, emission_matrix, test_corpus):
@@ -11,27 +13,44 @@ class Viterbi(object):
         tag_counts: Dict of tag_counts (like HMM class)
         transition matrix: transition matrix of HMM class
         emission matrix: emission matrix of HMM class
-        test_corpus: test corpus (include test words and according true labels)
+        test_corpus: test corpus (include test words and according true labels) (.pos)
         """
-        self.vocab = get_index_vocab(vocab_txt=vocab_txt)
+        self.vocab_txt = vocab_txt
         self.tag_counts = tag_counts
         self.transition_matrix = transition_matrix
         self.emission_matrix = emission_matrix
         self.test_corpus = test_corpus
 
-        # Inner attributes
+        # Inner attributes (processed by calling Set_up method)
         """
         states: List of all possible tags
         test_word: file of test words (.words) after remove true labels
         """
+        self.vocab = None
+        self.states = None
+        self.test_words = None
+        self.y = None
+        self.best_paths = None
+        self.pred = None
+
+
+    def Set_up(self):
+        """
+        Preprocess attributes assign to class
+        """
+        # Create vocab with index
+        self.vocab = get_index_vocab(vocab_txt=self.vocab_txt)
+
+        # Extract test_words and tags respectively
+        self.test_words, self.y = load_test_corpus(self.test_corpus)
+        _, self.test_words = preprocess_list(vocab=self.vocab, test_words_list=self.test_words)
+
+        # Nums of all possible tags
         self.states = list(sorted(self.tag_counts.keys()))
-        self.test_words = preprocess(vocab=self.vocab, corpus=self.test_corpus)[1]
-        # best_probs has shape of (num_tags, len(test_corpus)) of float:  
-        # best_probs[i, j] gives the probs at which word[j] is assigned with tag i 
-        self.best_probs = np.zeros((len(self.tag_counts), len(self.test_words)))           
-        # best_path has (num_tags, len(test_corpus)) of integer store index of assign tag in vocab
+
+        self.best_probs = np.zeros((len(self.tag_counts), len(self.test_words)))     
         self.best_paths = np.zeros((len(self.tag_counts), len(self.test_words)), dtype = int)
-    
+        self.pred = [None] * len(self.test_words)
 
     def _initialize(self):
         """
@@ -42,7 +61,7 @@ class Viterbi(object):
         start_token_idx = self.states.index(start_token)
         num_tags = len(self.tag_counts)
         for i in range(num_tags):
-            self.best_probs[i, 0] = math.log(self.transition_matrix[start_token_idx, i]) + math.log(self.emission_matrix[i, self.vocab[self.test_words[0]]])
+            self.best_probs[i, 0] = np.log(self.transition_matrix[start_token_idx, i]) + np.log(self.emission_matrix[i, self.vocab[self.test_words[0]]])
         return 
     
 
@@ -59,41 +78,76 @@ class Viterbi(object):
             # Traverse each num_tag at column i
             for j in range(num_tags):
                 # # Normal
-                best_prob = -float("inf")
-                best_path = 0       
-                # Traverse each num_tag at column i - 1
+                # best_prob = -float("inf")
+                # best_path = 0       
+                # # Traverse each num_tag at column i - 1
                 # for k in range(num_tags):
                 #     prob = self.best_probs[k, i - 1] + math.log(self.transition_matrix[k, j]) + math.log(self.emission_matrix[j, self.vocab[self.test_words[i]]])
                 #     # Update best_prob
                 #     if prob > best_prob:
                 #         best_prob = prob
                 #         best_path = k
-                # Vectorization (speed up x3)
-                prob_vector_i = self.best_probs[:, i - 1] + np.log(self.transition_matrix[:, j]) +  np.log(self.emission_matrix[j, self.vocab[self.test_words[i]]]) 
-                # print(prob_vector_i)
+                # Vectorization (speed up x5)
+                prob_vector_i = self.best_probs[:, i - 1] + np.log(self.transition_matrix[:, j]) +  np.log(self.emission_matrix[j, self.vocab[self.test_words[i]]]) * np.ones((num_tags, 1))
                 best_prob = np.max(prob_vector_i)
                 best_path = np.argmax(prob_vector_i)
-            
+                
                 self.best_probs[j, i] = best_prob
                 self.best_paths[j, i] = best_path
-            if i == 4:
-                break
+            # if i == 4:
+            #     break
 
         return self.best_probs, self.best_paths
     
+    
+    def _backward(self):
+        n = len(self.test_words)
+        # Array z store the decision of each colummn
+        z = [None] * n
+        num_tags = len(self.tag_counts)
+        # Find largest probability of last column
+        z[n - 1] = np.argmax(self.best_probs[:, n - 1])
+        self.pred[n - 1] = self.states[z[n - 1]]
+
+        for i in range(n - 1, -1, - 1):
+            pos_tag_for_word_i = z[i]
+            z[i - 1] = self.best_paths[pos_tag_for_word_i, i]
+            self.pred[i - 1] = self.states[z[i - 1]]
+        return self.pred
+    
+
+    def _calculate_accuracy(self):
+        """
+        Calculate accuracy of self.pred and self.y
+        """
+        assert len(self.pred) == len(self.y)
+        num_correct = 0
+        for pred, label in zip(self.pred, self.y):
+            if (pred == label):
+                num_correct += 1
+        return num_correct / len(self.pred)
+
+    
 if __name__ == "__main__":
-    hmm = HMM(training_corpus=get_training_corpus("./data/WSJ_02-21.pos"), vocab_txt="./data/hmm_vocab.txt")
+    hmm = HMM(training_corpus=get_training_corpus("./data/WSJ_02-21.pos"), vocab_txt="./data/vocab.txt")
     hmm._create_counts()
     hmm._create_transition_matrix()
     hmm._create_emission_matrix()
-    viterbi = Viterbi(vocab_txt="./data/hmm_vocab.txt", transition_matrix=hmm.transition_matrix, 
+    print("hmm ts mtrix", hmm.transition_matrix.shape)
+    print("hmm emm mtrix", hmm.emission_matrix.shape)
+    viterbi = Viterbi(vocab_txt="./data/vocab.txt", transition_matrix=hmm.transition_matrix, 
                       emission_matrix=hmm.emission_matrix, test_corpus="./data/WSJ_24.pos", tag_counts=hmm.tag_counts)
+    viterbi.Set_up()
     viterbi._initialize()
+    print("Viterbi vocab", len(viterbi.vocab))
+    print("Viterbi ts matrix", viterbi.transition_matrix.shape)
+    print("Viterbi em matrix", viterbi.emission_matrix.shape)
+    print("Viter testwords", len(viterbi.test_words))
+    print("Viterbi best_prob", viterbi.best_probs.shape)
     viterbi._forward()
-    print(viterbi.best_probs[0:5, 0:5])
-    print(viterbi.best_probs[30:35])
-    print(f"best_probs[0,1]: {viterbi.best_probs[0,1]:.4f}") 
-    print(f"best_probs[0,4]: {viterbi.best_probs[0,4]:.4f}") 
-    print(viterbi.best_paths[0:5, 0:5])
-
+    viterbi._backward()
+    res = viterbi._calculate_accuracy()
+    print(viterbi.best_probs[:5,:5])
+    print(viterbi.best_paths[:5,:5])
+    print(res)
     
