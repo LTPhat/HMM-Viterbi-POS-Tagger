@@ -61,6 +61,7 @@ def get_word_tag(line, vocab):
         return word, tag
     return None 
 
+
 def preprocess(vocab, corpus):
     """
     Preprocess test corpus
