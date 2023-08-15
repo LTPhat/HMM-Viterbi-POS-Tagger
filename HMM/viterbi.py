@@ -4,6 +4,8 @@ from load import *
 from utils import *
 import math
 from process_test_corpus import *
+import os
+import pickle
 
 
 class Viterbi(object):
@@ -26,12 +28,12 @@ class Viterbi(object):
         states: List of all possible tags
         test_word: file of test words (.words) after remove true labels
         """
-        self.vocab = None
-        self.states = None
-        self.test_words = None
-        self.y = None
-        self.best_paths = None
-        self.pred = None
+        self.vocab = get_index_vocab(vocab_txt=self.vocab_txt)
+        self.states = list(sorted(self.tag_counts.keys()))
+        self.test_words, self.y = load_test_corpus(self.test_corpus)
+        self.best_probs = np.zeros((len(self.tag_counts), len(self.test_words)))     
+        self.best_paths = np.zeros((len(self.tag_counts), len(self.test_words)), dtype = int)
+        self.pred = [None] * len(self.test_words)
 
 
     def Set_up(self):
@@ -62,7 +64,7 @@ class Viterbi(object):
         num_tags = len(self.tag_counts)
         for i in range(num_tags):
             self.best_probs[i, 0] = np.log(self.transition_matrix[start_token_idx, i]) + np.log(self.emission_matrix[i, self.vocab[self.test_words[0]]])
-        return 
+        return self.best_probs, self.best_paths
     
 
     def _forward(self, verbose = True):
@@ -126,19 +128,35 @@ class Viterbi(object):
             if (pred == label):
                 num_correct += 1
         return num_correct / len(self.pred)
+    
+    @staticmethod
+    def save_pkl(data, dir):
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        output = open('{}.pkl'.format(data), 'wb')
+        pickle.dump(data, output)
+        output.close()
+        return 
 
     
 if __name__ == "__main__":
-    hmm = HMM(training_corpus=get_training_corpus("./data/WSJ_02-21.pos"), vocab_txt="./data/vocab.txt")
+    hmm = HMM(training_corpus=get_training_corpus("./data/WSJ_02-21.pos"), vocab_txt="./data/hmm_vocab.txt", alpha=0.001)
     hmm._create_counts()
     hmm._create_transition_matrix()
     hmm._create_emission_matrix()
     print("hmm ts mtrix", hmm.transition_matrix.shape)
     print("hmm emm mtrix", hmm.emission_matrix.shape)
-    viterbi = Viterbi(vocab_txt="./data/vocab.txt", transition_matrix=hmm.transition_matrix, 
+    viterbi = Viterbi(vocab_txt="./data/hmm_vocab.txt", transition_matrix=hmm.transition_matrix, 
                       emission_matrix=hmm.emission_matrix, test_corpus="./data/WSJ_24.pos", tag_counts=hmm.tag_counts)
     viterbi.Set_up()
-    viterbi._initialize()
+    best_probs_init, best_paths_init = viterbi._initialize()
+    # viterbi.save_pkl(best_probs_init, "pkl")
+    # viterbi.save_pkl(best_paths_init, "pkl")
+
+    best_probs, best_paths = viterbi._forward()
+    # viterbi.save_pkl(best_probs, "pkl")
+    # viterbi.save_pkl(best_paths, "pkl")
+
     print("Viterbi vocab", len(viterbi.vocab))
     print("Viterbi ts matrix", viterbi.transition_matrix.shape)
     print("Viterbi em matrix", viterbi.emission_matrix.shape)
