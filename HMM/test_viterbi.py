@@ -19,12 +19,13 @@ class TestViterbi(unittest.TestCase):
         self.states = states
         self.test_words = preprocess(self.vocab, self.test_corpus)
 
+
     def test_initialize(self):
         test_cases = [
         {
             "name": "default_check",
             "input": {
-                "states": states,
+                "states": self.states,
                 "tag_counts": self.tag_counts,
                 "A": self.transition_matrix,
                 "B": self.emission_matrix,
@@ -91,6 +92,7 @@ class TestViterbi(unittest.TestCase):
             viterbi = Viterbi(vocab_txt=self.vocab_txt, tag_counts= test["input"]["tag_counts"], 
                               transition_matrix=test["input"]["A"], emission_matrix=test["input"]["B"],
                               test_corpus=test["input"]["corpus"])
+            viterbi.Set_up()
             
             viterbi._initialize()
             self.assertEqual(viterbi.best_probs.shape, test["expected"]["best_probs_shape"], 
@@ -110,13 +112,10 @@ class TestViterbi(unittest.TestCase):
                 "A": self.transition_matrix,
                 "B": self.emission_matrix,
                 "test_corpus": self.test_corpus,
-                "best_probs": pickle.load(
-                    open("./support_files/best_probs_initilized.pkl", "rb")
-                ),
-                "best_paths": pickle.load(
-                    open("./support_files/best_paths_initilized.pkl", "rb")
-                ),
-                "vocab": vocab,
+                "best_probs": np.load("./npy/best_probs_init.npy")
+                ,
+                "best_paths": np.load("./npy/best_paths_init.npy"),
+                "vocab": self.vocab,
                 "verbose": False,
             },
             "expected": {
@@ -160,43 +159,31 @@ class TestViterbi(unittest.TestCase):
                     ]
                 ),
                 "best_probs30:35": np.array(
-                    [
-                        [
-                            -202.75618827,
-                            -208.38838519,
-                            -210.46938402,
-                            -210.15943098,
-                            -223.79223672,
-                        ],
-                        [
-                            -202.58297597,
-                            -217.72266765,
-                            -207.23725672,
-                            -215.529735,
-                            -224.13957203,
-                        ],
-                        [
-                            -202.00878092,
-                            -214.23093833,
-                            -217.41021623,
-                            -220.73768708,
-                            -222.03338753,
-                        ],
-                        [
-                            -200.44016117,
-                            -209.46937757,
-                            -209.06951664,
-                            -216.22297765,
-                            -221.09669653,
-                        ],
-                        [
-                            -208.74189499,
-                            -214.62088817,
-                            -209.79346523,
-                            -213.52623459,
-                            -228.70417526,
-                        ],
-                    ]
+                    [[-216.38719574, 
+                      -218.46819458,
+                      -218.15824153,
+                      -231.79104728,
+                       -240.7698141 ],
+                        [-225.72147821, 
+                        -215.23606728, 
+                        -223.52854555, 
+                        -232.13838258, 
+                        -240.5966018 ],
+                        [-222.22974889, 
+                        -225.40902679,
+                        -228.73649763,
+                        -230.03219809,
+                        -240.02240676],
+                        [-217.46818813, 
+                        -217.06832719, 
+                        -224.2217882 , 
+                        -229.09550709 ,
+                        -238.45378701],
+                        [-222.61969873,
+                        -217.79227578,
+                        -221.52504514,
+                        -236.70298582,
+                        -244.43163273]]
                 ),
                 "best_paths0:5": np.array(
                     [
@@ -208,22 +195,81 @@ class TestViterbi(unittest.TestCase):
                     ]
                 ),
                 "best_paths30:35": np.array(
-                    [
-                        [20, 19, 35, 11, 21],
-                        [20, 19, 35, 11, 21],
-                        [20, 19, 35, 11, 21],
-                        [20, 19, 35, 11, 21],
-                        [35, 19, 35, 11, 34],
+                   [
+                    [19, 35 ,11 ,21, 20],
+                    [19 ,35, 11, 21, 20],
+                    [19 ,35 ,11 ,21, 20],
+                    [19, 35 ,11 ,21, 20],
+                    [19, 35 ,11 ,34, 3],
                     ]
                 ),
             },
         }
     ]
+        for test in test_cases:
+            viterbi = Viterbi(vocab_txt=self.vocab_txt, tag_counts= self.tag_counts, 
+                              transition_matrix=test["input"]["A"], emission_matrix=test["input"]["B"],
+                              test_corpus=test["input"]["test_corpus"])
+            viterbi.Set_up()
+            viterbi._initialize()
+            viterbi._forward()
+            for range_ in test["expected"]:
+                get_index = list(range_[10:].split(":"))
+                index0 = int(get_index[0])
+                index1 = int(get_index[1])
+                if (range_[:10] == "best_probs"):
+                    sub_best_probs = viterbi.best_probs[index0 : index1,  index0: index1]
+                    np.testing.assert_almost_equal(sub_best_probs, test["expected"][range_],decimal=6
+                                                   ,err_msg= "Wrong value of {}, expected {}, got {}".format(range_, test["expected"][range_], sub_best_probs))
+                else:
+                    sub_best_paths = viterbi.best_paths[index0 : index1,  index0: index1]
+                    np.testing.assert_almost_equal(sub_best_paths, test["expected"][range_],
+                                     err_msg= "Wrong value of {}, expected {}, got {}".format(range_, test["expected"][range_], sub_best_paths))
+            
 
-
-
-
-
+    def test_backward(self):
+        test_cases = [
+        {
+            "name": "default_check",
+            "input": {
+                "corpus": self.test_corpus,
+                "best_probs": np.load("./npy/best_probs.npy")
+                ,
+                "best_paths": np.load("./npy/best_paths.npy"),
+                "states": states,
+            },
+            "expected": {
+                "pred_len": 32853,
+                "pred_head": [
+                    "DT",
+                    "NN",
+                    "POS",
+                    "NN",
+                    "MD",
+                    "VB",
+                    "VBN",
+                    "IN",
+                    "JJ",
+                    "NN",
+                ],
+                "pred_tail": ['VBN', 'PRP', 'MD', 'RB', 'VB', 'PRP', 'RB', 'IN', 'PRP', '#'],
+            },
+        }
+    ]   
+        for test in test_cases:
+            viterbi = Viterbi(vocab_txt=self.vocab_txt, tag_counts= self.tag_counts, 
+                              transition_matrix=self.transition_matrix, emission_matrix=self.emission_matrix,
+                              test_corpus=self.test_corpus)
+            viterbi.Set_up()
+            viterbi._initialize()
+            viterbi._forward()
+            viterbi._backward()
+            
+            self.assertEqual(len(viterbi.pred), test["expected"]["pred_len"], msg="Wrong length of test_corpus prediction, expected {}, got {}".format(test["expected"]["pred_len"], len(viterbi.pred)))
+            np.testing.assert_equal(viterbi.pred[:10], test["expected"]["pred_head"],
+                                    err_msg= "Wrong prediction of first 10 tags, expected: {}, got: {}".format(test["expected"]["pred_head"], viterbi.pred[:10]))
+            np.testing.assert_equal(viterbi.pred[-10:], test["expected"]["pred_tail"],
+                                    err_msg= "Wrong prediction of last 10 tags, expected: {}, got: {}".format(test["expected"]["pred_tail"], viterbi.pred[-10:]))
 
 
 
