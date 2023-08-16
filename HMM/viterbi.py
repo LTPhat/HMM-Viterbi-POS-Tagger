@@ -130,12 +130,10 @@ class Viterbi(object):
         return num_correct / len(self.pred)
     
     @staticmethod
-    def save_pkl(data, dir):
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        output = open('{}.pkl'.format(data), 'wb')
-        pickle.dump(data, output)
-        output.close()
+    def save_data(data, save_dir, data_name):
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        np.save(save_dir + "/{}".format(data_name), data)
         return 
 
     
@@ -144,28 +142,19 @@ if __name__ == "__main__":
     hmm._create_counts()
     hmm._create_transition_matrix()
     hmm._create_emission_matrix()
-    print("hmm ts mtrix", hmm.transition_matrix.shape)
-    print("hmm emm mtrix", hmm.emission_matrix.shape)
     viterbi = Viterbi(vocab_txt="./data/hmm_vocab.txt", transition_matrix=hmm.transition_matrix, 
                       emission_matrix=hmm.emission_matrix, test_corpus="./data/WSJ_24.pos", tag_counts=hmm.tag_counts)
     viterbi.Set_up()
     best_probs_init, best_paths_init = viterbi._initialize()
-    # viterbi.save_pkl(best_probs_init, "pkl")
-    # viterbi.save_pkl(best_paths_init, "pkl")
+
+    # viterbi.save_data(best_probs_init, "./npy", "best_probs_init")
+    # viterbi.save_data(best_paths_init, "./npy", "best_paths_init")
 
     best_probs, best_paths = viterbi._forward()
-    # viterbi.save_pkl(best_probs, "pkl")
-    # viterbi.save_pkl(best_paths, "pkl")
+     # viterbi.save_data(best_probs, "./npy", "best_probs")
+    # viterbi.save_data(best_paths, "./npy", "best_paths")
 
-    print("Viterbi vocab", len(viterbi.vocab))
-    print("Viterbi ts matrix", viterbi.transition_matrix.shape)
-    print("Viterbi em matrix", viterbi.emission_matrix.shape)
-    print("Viter testwords", len(viterbi.test_words))
-    print("Viterbi best_prob", viterbi.best_probs.shape)
-    viterbi._forward()
     viterbi._backward()
-    res = viterbi._calculate_accuracy()
-    print(viterbi.best_probs[:5,:5])
-    print(viterbi.best_paths[:5,:5])
-    print(res)
+    print(viterbi._calculate_accuracy())
+
     
