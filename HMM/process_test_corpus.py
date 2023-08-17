@@ -22,9 +22,11 @@ def load_test_corpus(corpur_url):
     for item in load:
         word_tag = item.split()
         if len(word_tag) != 2:
-            continue
-        word = word_tag[0]
-        tag = word_tag[1]
+            word = "--n--"
+            tag = "--s--"
+        else:
+            word = word_tag[0]
+            tag = word_tag[1]
         test_words.append(word)
         y.append(tag)
     return test_words, y
@@ -90,6 +92,12 @@ def preprocess_words(vocab, test_words_file):
 
 if __name__ == "__main__":
     words, label = load_test_corpus("./data/WSJ_24.pos")
-    print("First 50 words in test corpus: ", words[:50])
-    print("First 50 tags in test corpus: ", label[:50])
+    print("First 50 words in test corpus: ", words[:10])
+    print("First 50 tags in test corpus: ", label[:10])
+    print(len(words))
+    print(words[:30])
+    vocab_txt="./data/hmm_vocab.txt"
+    vocab = get_index_vocab(vocab_txt=vocab_txt)
+    _, test_words = preprocess_list(vocab=vocab, test_words_list=words) 
+    print(test_words[:30])
 
