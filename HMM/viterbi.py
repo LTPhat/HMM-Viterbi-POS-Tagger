@@ -9,50 +9,30 @@ import pickle
 
 
 class Viterbi(object):
-    def __init__(self, vocab_txt, tag_counts, transition_matrix, emission_matrix, test_corpus):
+    def __init__(self, vocab, tag_counts, transition_matrix, emission_matrix, test_words, y):
         """
         vocab_txt: Vocabulary txt file
         tag_counts: Dict of tag_counts (like HMM class)
         transition matrix: transition matrix of HMM class
         emission matrix: emission matrix of HMM class
-        test_corpus: test corpus (include test words and according true labels) (.pos)
+        test_words: test words after preprocessing 
         """
-        self.vocab_txt = vocab_txt
+        self.vocab = vocab
         self.tag_counts = tag_counts
         self.transition_matrix = transition_matrix
         self.emission_matrix = emission_matrix
-        self.test_corpus = test_corpus
-
-        # Inner attributes (processed by calling Set_up method)
+        self.test_words = test_words
+        # Inner attributes 
         """
         states: List of all possible tags
         test_word: file of test words (.words) after remove true labels
         """
-        self.vocab = get_index_vocab(vocab_txt=self.vocab_txt)
         self.states = list(sorted(self.tag_counts.keys()))
-        self.test_words, self.y = load_test_corpus(self.test_corpus)
         self.best_probs = np.zeros((len(self.tag_counts), len(self.test_words)))     
         self.best_paths = np.zeros((len(self.tag_counts), len(self.test_words)), dtype = int)
         self.pred = [None] * len(self.test_words)
+        self.y = y
 
-
-    def Set_up(self):
-        """
-        Preprocess attributes assign to class
-        """
-        # Create vocab with index
-        self.vocab = get_index_vocab(vocab_txt=self.vocab_txt)
-
-        # Extract test_words and tags respectively
-        self.test_words, self.y = load_test_corpus(self.test_corpus)
-        _, self.test_words = preprocess_list(vocab=self.vocab, test_words_list=self.test_words)
-
-        # Nums of all possible tags
-        self.states = list(sorted(self.tag_counts.keys()))
-
-        self.best_probs = np.zeros((len(self.tag_counts), len(self.test_words)))     
-        self.best_paths = np.zeros((len(self.tag_counts), len(self.test_words)), dtype = int)
-        self.pred = [None] * len(self.test_words)
 
     def _initialize(self):
         """
@@ -67,7 +47,7 @@ class Viterbi(object):
         return self.best_probs, self.best_paths
     
 
-    def _forward(self, verbose = True):
+    def _forward(self,verbose = True):
         """
         Complete best_probs, best_paths matrix
         """
@@ -129,6 +109,7 @@ class Viterbi(object):
                 num_correct += 1
         return num_correct / len(self.pred)
     
+    
     @staticmethod
     def save_data(data, save_dir, data_name):
         if not os.path.exists(save_dir):
@@ -138,23 +119,38 @@ class Viterbi(object):
 
     
 if __name__ == "__main__":
-    hmm = HMM(training_corpus=get_training_corpus("./data/WSJ_02-21.pos"), vocab_txt="./data/hmm_vocab.txt", alpha=0.001)
+    print("------------Running viterbi.py---------------")
+    vocab_txt="./data/vocab.txt"
+    vocab = get_index_vocab(vocab_txt=vocab_txt)
+    training_corpus = "./data/WSJ_02-21.pos"
+    training_corpus = get_training_corpus(training_corpus)
+    test_corpus="./data/WSJ_23.pos"
+    test_words, label = load_test_corpus(test_corpus)
+    _, test_words = preprocess_list(vocab=vocab, test_words_list=test_words)
+
+    hmm = HMM(training_corpus=training_corpus, vocab=vocab, alpha=1)
     hmm._create_counts()
     hmm._create_transition_matrix()
     hmm._create_emission_matrix()
-    viterbi = Viterbi(vocab_txt="./data/hmm_vocab.txt", transition_matrix=hmm.transition_matrix, 
-                      emission_matrix=hmm.emission_matrix, test_corpus="./data/WSJ_24.pos", tag_counts=hmm.tag_counts)
-    viterbi.Set_up()
-    best_probs_init, best_paths_init = viterbi._initialize()
 
+    # Define class
+    viterbi = Viterbi(vocab=vocab, tag_counts=hmm.tag_counts, transition_matrix=hmm.transition_matrix
+                      ,emission_matrix=hmm.emission_matrix, test_words=test_words, y=label)
+    
+    best_probs_init, best_paths_init = viterbi._initialize()
+    print("Viterbi initialized ...")
     # viterbi.save_data(best_probs_init, "./npy", "best_probs_init")
     # viterbi.save_data(best_paths_init, "./npy", "best_paths_init")
-
+    print("Running viterbi forward ...")
     best_probs, best_paths = viterbi._forward()
-     # viterbi.save_data(best_probs, "./npy", "best_probs")
+    print("Completed viterbi forward ...")
+    # viterbi.save_data(best_probs, "./npy", "best_probs")
     # viterbi.save_data(best_paths, "./npy", "best_paths")
+    print("Saved best_probs and best_paths")
+    print("Running viterbi backward ...")
+    pred = viterbi._backward()
+    print("Completed viterbi backward ...")
+    print("Accuracy on test_words is: {}".format(viterbi._calculate_accuracy()))
 
-    viterbi._backward()
-    print(viterbi._calculate_accuracy())
 
     
