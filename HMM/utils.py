@@ -1,6 +1,6 @@
 import numpy as np
 import string
-
+from load import *
 punct = set(string.punctuation)
 
 noun_suffix = ["action", "al", "age", "ance", "cy", "dom", "ee", "ence", "er", "hood", "ion", "ism", "ist", "ity", "ling", "ment", "ness", "or", "ry", "scape", "ship", "ty"]
@@ -11,7 +11,7 @@ adv_suffix = ["ward", "wards", "wise"]
 
 def assign_unk(token):
     """
-    Assign unknown word tokens
+    Assign unknown word (not in vocab) tokens
     """
     # Digits
     if any(char.isdigit() for char in token):
@@ -43,6 +43,7 @@ def assign_unk(token):
 
     return "--unk--"
 
+
 def get_word_tag(line, vocab):
     """
     Get word and tag in a line of train/test corpus
@@ -60,3 +61,4 @@ def get_word_tag(line, vocab):
             word = assign_unk(word)
         return word, tag
     return None 
+
