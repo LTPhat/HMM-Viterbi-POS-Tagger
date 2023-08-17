@@ -43,6 +43,7 @@ def assign_unk(token):
 
     return "--unk--"
 
+
 def get_word_tag(line, vocab):
     """
     Get word and tag in a line of train/test corpus
@@ -61,40 +62,3 @@ def get_word_tag(line, vocab):
         return word, tag
     return None 
 
-
-def preprocess(vocab, corpus):
-    """
-    Preprocess test corpus
-    """
-    origin = []
-    processed = []
-    with open(corpus, "r") as data_file:
-        for _, word in enumerate(data_file):
-            # End of sentence
-            if not word.split():
-                origin.append(word.strip())
-                word = "--n--"
-                processed.append(word)
-                continue
-
-            # Handle unknown words
-            elif word.strip() not in vocab:
-                origin.append(word.strip())
-                word = assign_unk(word)
-                processed.append(word)
-                continue
-
-            else:
-                origin.append(word.strip())
-                processed.append(word.strip())
-    return origin, processed
-
-
-if __name__ == "__main__":
-    vocab = "./data/hmm_vocab.txt"
-    test_corpus = "./data/WSJ_24.pos"
-    orgi, processed = preprocess(vocab=get_index_vocab(vocab), corpus = test_corpus)
-    print(len(processed))
-    print(processed[:10])
-    print(orgi[:10])
-    print(list(get_index_vocab(vocab_txt=vocab).items())[:10])

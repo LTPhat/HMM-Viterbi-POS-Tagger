@@ -17,7 +17,8 @@ class TestViterbi(unittest.TestCase):
         self.emission_matrix = emission_matrix
         self.test_corpus = test_corpus
         self.states = states
-        self.test_words = preprocess(self.vocab, self.test_corpus)
+        self.test_words, self.y = load_test_corpus(self.test_corpus)
+        _, self.test_words = preprocess_list(vocab=self.vocab, test_words_list=self.test_words)
 
 
     def test_initialize(self):
@@ -274,6 +275,7 @@ class TestViterbi(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    print("-------Runing unittest for Viterbi class-------")
     vocab_txt = "./data/hmm_vocab.txt"
     training_corpus = "./data/WSJ_02-21.pos"
     training_corpus = get_training_corpus(training_corpus)

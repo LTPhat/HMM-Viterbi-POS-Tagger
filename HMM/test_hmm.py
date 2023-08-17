@@ -15,8 +15,6 @@ class TestHMM(unittest.TestCase):
         self.default_alpha = 0.001
         self.default_hmm = HMM(vocab_txt=self.vocab_txt, training_corpus=self.training_corpus, alpha=self.default_alpha)
         self.default_hmm._create_counts()
-        # self.hmm._create_transition_matrix()
-        # self.hmm._create_emission_matrix()
         return 
 
 
@@ -288,7 +286,7 @@ class TestHMM(unittest.TestCase):
                 "alpha": 0.001,
                 "tag_counts": self.default_hmm.tag_counts,
                 "emission_counts": self.default_hmm.emission_counts,
-                "vocab": vocab,
+                "vocab": self.vocab_txt,
             },
             "expected": {
                 (0,5): np.array(
@@ -377,7 +375,7 @@ class TestHMM(unittest.TestCase):
                 "alpha": 0.05,
                 "tag_counts": self.default_hmm.tag_counts,
                 "emission_counts": self.default_hmm.emission_counts,
-                "vocab": vocab,
+                "vocab": self.vocab_txt,
             },
             "expected": {
                 (0,5): np.array(
@@ -465,7 +463,6 @@ class TestHMM(unittest.TestCase):
             alpha = test["input"]["alpha"]
             hmm = HMM(vocab_txt=self.vocab_txt, training_corpus=self.training_corpus, alpha=alpha)
             hmm._create_counts()
-            # hmm._create_transition_matrix()
             hmm._create_emission_matrix()
             num_tags = len(hmm.tag_counts.keys())
             num_words = len(hmm.vocab)
@@ -477,6 +474,7 @@ class TestHMM(unittest.TestCase):
                 decimal=8, err_msg="Wrong output of transition matrix at slice {}, expected: {}".format(range_, test["expected"][range_])) 
 
 if __name__ == "__main__":
+    print("-----------Running Unittest for HMM class----------")
     vocab = "./data/hmm_vocab.txt"
     training_corpus = get_training_corpus("./data/WSJ_02-21.pos")
     unittest.main(verbosity=2)
