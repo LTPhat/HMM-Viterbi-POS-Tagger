@@ -10,10 +10,10 @@ from load import *
 class TestHMM(unittest.TestCase):
     
     def setUp(self):
-        self.vocab_txt = vocab
+        self.vocab = vocab
         self.training_corpus = training_corpus
         self.default_alpha = 0.001
-        self.default_hmm = HMM(vocab_txt=self.vocab_txt, training_corpus=self.training_corpus, alpha=self.default_alpha)
+        self.default_hmm = HMM(vocab=self.vocab, training_corpus=self.training_corpus, alpha=self.default_alpha)
         self.default_hmm._create_counts()
         return 
 
@@ -24,7 +24,7 @@ class TestHMM(unittest.TestCase):
             "name": "default_case",
             "input": {
                 "training_corpus": self.training_corpus,
-                "vocab": self.vocab_txt,
+                "vocab": self.vocab,
                 "verbose": False,
             },
             "expected": {
@@ -48,7 +48,7 @@ class TestHMM(unittest.TestCase):
             "name": "small_case",
             "input": {
                 "training_corpus": self.training_corpus[:1000],
-                "vocab": self.vocab_txt,
+                "vocab": self.vocab,
                 "verbose": False,
             },
             "expected": {
@@ -73,7 +73,7 @@ class TestHMM(unittest.TestCase):
         for test in test_cases:
             training_corpus = test["input"]["training_corpus"]
             vocab = test["input"]["vocab"]
-            hmm = HMM(vocab_txt=vocab, training_corpus=training_corpus, alpha=self.default_alpha)
+            hmm = HMM(vocab= vocab, training_corpus=training_corpus, alpha=self.default_alpha)
             hmm._create_counts()
             self.assertIsInstance(hmm.emission_counts, defaultdict, msg= "Wrong type of Emissions_counts, expected: Defaultdict")
             self.assertIsInstance(hmm.transition_counts, defaultdict, msg= "Wrong type of Transition_counts, expected: Defaultdict")
@@ -267,7 +267,7 @@ class TestHMM(unittest.TestCase):
     ]
         for test in test_cases:
             alpha = test["input"]["alpha"]
-            hmm = HMM(vocab_txt=self.vocab_txt, training_corpus=self.training_corpus, alpha=alpha)
+            hmm = HMM(vocab=self.vocab, training_corpus=self.training_corpus, alpha=alpha)
             hmm._create_counts()
             hmm._create_transition_matrix()
             num_tags = len(hmm.tag_counts.keys())
@@ -286,7 +286,7 @@ class TestHMM(unittest.TestCase):
                 "alpha": 0.001,
                 "tag_counts": self.default_hmm.tag_counts,
                 "emission_counts": self.default_hmm.emission_counts,
-                "vocab": self.vocab_txt,
+                "vocab": self.vocab,
             },
             "expected": {
                 (0,5): np.array(
@@ -375,7 +375,7 @@ class TestHMM(unittest.TestCase):
                 "alpha": 0.05,
                 "tag_counts": self.default_hmm.tag_counts,
                 "emission_counts": self.default_hmm.emission_counts,
-                "vocab": self.vocab_txt,
+                "vocab": self.vocab,
             },
             "expected": {
                 (0,5): np.array(
@@ -461,7 +461,7 @@ class TestHMM(unittest.TestCase):
     ]
         for test in test_cases:
             alpha = test["input"]["alpha"]
-            hmm = HMM(vocab_txt=self.vocab_txt, training_corpus=self.training_corpus, alpha=alpha)
+            hmm = HMM(vocab=self.vocab, training_corpus=self.training_corpus, alpha=alpha)
             hmm._create_counts()
             hmm._create_emission_matrix()
             num_tags = len(hmm.tag_counts.keys())
@@ -476,5 +476,6 @@ class TestHMM(unittest.TestCase):
 if __name__ == "__main__":
     print("-----------Running Unittest for HMM class----------")
     vocab = "./data/hmm_vocab.txt"
+    vocab = get_index_vocab(vocab_txt=vocab)
     training_corpus = get_training_corpus("./data/WSJ_02-21.pos")
     unittest.main(verbosity=2)
