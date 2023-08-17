@@ -20,188 +20,188 @@ class TestViterbi(unittest.TestCase):
         _, self.test_words = preprocess_list(vocab=self.vocab, test_words_list=self.test_words)
 
 
-#     def test_initialize(self):
-#         test_cases = [
-#         {
-#             "name": "default_check",
-#             "input": {
-#                 "states": self.states,
-#                 "tag_counts": self.tag_counts,
-#                 "A": self.transition_matrix,
-#                 "B": self.emission_matrix,
-#                 "corpus": self.test_words,
-#                 "vocab": self.vocab,
-#             },
-#             "expected": {
-#                 "best_probs_shape": (46, 34199),
-#                 "best_paths_shape": (46, 34199),
-#                 "best_probs_col0": np.array(
-#                     [
-#                         -22.60982633,
-#                         -23.07660654,
-#                         -23.57298822,
-#                         -19.76726066,
-#                         -24.74325104,
-#                         -35.20241402,
-#                         -35.00096024,
-#                         -34.99203854,
-#                         -21.35069072,
-#                         -19.85767814,
-#                         -21.92098414,
-#                         -4.01623741,
-#                         -19.16380593,
-#                         -21.1062242,
-#                         -20.47163973,
-#                         -21.10157273,
-#                         -21.49584851,
-#                         -20.4811853,
-#                         -18.25856307,
-#                         -23.39717471,
-#                         -21.92146798,
-#                         -9.41377777,
-#                         -21.03053445,
-#                         -21.08029591,
-#                         -20.10863677,
-#                         -33.48185979,
-#                         -19.47301382,
-#                         -20.77150242,
-#                         -20.11727696,
-#                         -20.56031676,
-#                         -20.57193964,
-#                         -32.30366295,
-#                         -18.07551522,
-#                         -22.58887909,
-#                         -19.1585905,
-#                         -16.02994331,
-#                         -24.30968545,
-#                         -20.92932218,
-#                         -21.96797222,
-#                         -24.29571895,
-#                         -23.45968569,
-#                         -22.43665883,
-#                         -20.46568904,
-#                         -22.75551606,
-#                         -19.6637215,
-#                         -18.36288463,
-#                     ]
-#                 ),
-#             },
-#         }
-#     ]
-#         for test in test_cases:
-#             viterbi = Viterbi(vocab=self.vocab, tag_counts= test["input"]["tag_counts"], 
-#                               transition_matrix=test["input"]["A"], emission_matrix=test["input"]["B"],
-#                               test_words=test["input"]["corpus"],y = self.y)
-#             viterbi._initialize()
-#             self.assertEqual(viterbi.best_probs.shape, test["expected"]["best_probs_shape"], 
-#                              msg="Wrong shape of best_probs matrix, expected {}".format((test["expected"]["best_probs_shape"])))
-#             self.assertEqual(viterbi.best_paths.shape, test["expected"]["best_paths_shape"],
-#                              msg="Wrong shape of best_paths matrix, expected {}".format((test["expected"]["best_paths_shape"])))
-#             np.testing.assert_almost_equal(viterbi.best_probs[:, 0], test["expected"]["best_probs_col0"],
-#                              err_msg=  "Wrong value of column 0 of best_probs matrix, expected {}".format(test["expected"]["best_probs_col0"]), decimal=8)
+    def test_initialize(self):
+        test_cases = [
+        {
+            "name": "default_check",
+            "input": {
+                "states": self.states,
+                "tag_counts": self.tag_counts,
+                "A": self.transition_matrix,
+                "B": self.emission_matrix,
+                "corpus": self.test_words,
+                "vocab": self.vocab,
+            },
+            "expected": {
+                "best_probs_shape": (46, 34199),
+                "best_paths_shape": (46, 34199),
+                "best_probs_col0": np.array(
+                    [
+                        -22.60982633,
+                        -23.07660654,
+                        -23.57298822,
+                        -19.76726066,
+                        -24.74325104,
+                        -35.20241402,
+                        -35.00096024,
+                        -34.99203854,
+                        -21.35069072,
+                        -19.85767814,
+                        -21.92098414,
+                        -4.01623741,
+                        -19.16380593,
+                        -21.1062242,
+                        -20.47163973,
+                        -21.10157273,
+                        -21.49584851,
+                        -20.4811853,
+                        -18.25856307,
+                        -23.39717471,
+                        -21.92146798,
+                        -9.41377777,
+                        -21.03053445,
+                        -21.08029591,
+                        -20.10863677,
+                        -33.48185979,
+                        -19.47301382,
+                        -20.77150242,
+                        -20.11727696,
+                        -20.56031676,
+                        -20.57193964,
+                        -32.30366295,
+                        -18.07551522,
+                        -22.58887909,
+                        -19.1585905,
+                        -16.02994331,
+                        -24.30968545,
+                        -20.92932218,
+                        -21.96797222,
+                        -24.29571895,
+                        -23.45968569,
+                        -22.43665883,
+                        -20.46568904,
+                        -22.75551606,
+                        -19.6637215,
+                        -18.36288463,
+                    ]
+                ),
+            },
+        }
+    ]
+        for test in test_cases:
+            viterbi = Viterbi(vocab=self.vocab, tag_counts= test["input"]["tag_counts"], 
+                              transition_matrix=test["input"]["A"], emission_matrix=test["input"]["B"],
+                              test_words=test["input"]["corpus"],y = self.y)
+            viterbi._initialize()
+            self.assertEqual(viterbi.best_probs.shape, test["expected"]["best_probs_shape"], 
+                             msg="Wrong shape of best_probs matrix, expected {}".format((test["expected"]["best_probs_shape"])))
+            self.assertEqual(viterbi.best_paths.shape, test["expected"]["best_paths_shape"],
+                             msg="Wrong shape of best_paths matrix, expected {}".format((test["expected"]["best_paths_shape"])))
+            np.testing.assert_almost_equal(viterbi.best_probs[:, 0], test["expected"]["best_probs_col0"],
+                             err_msg=  "Wrong value of column 0 of best_probs matrix, expected {}".format(test["expected"]["best_probs_col0"]), decimal=8)
 
 
 
-#     def test_forward(self):
-#         test_cases = [
-#         {
-#             "name": "default_check",
-#             "input": {
-#                 "A": self.transition_matrix,
-#                 "B": self.emission_matrix,
-#                 "test_corpus": self.test_words,
-#                 "best_probs": np.load("./npy/best_probs.npy"),
-#                 "best_paths": 
-#                     np.load("./npy/best_paths.npy"),
-#                 "vocab": self.vocab,
-#                 "verbose": False,
-#             },
-#             "expected": {
-#                 "best_probs0:5": np.array(
-#                     [
-#                         [
-#                             -22.60982633,
-#                             -24.78215633,
-#                             -34.08246498,
-#                             -34.34107105,
-#                             -49.56012613,
-#                         ],
-#                         [
-#                             -23.07660654,
-#                             -24.51583896,
-#                             -35.04774303,
-#                             -35.28281026,
-#                             -50.52540418,
-#                         ],
-#                         [
-#                             -23.57298822,
-#                             -29.98305064,
-#                             -31.98004656,
-#                             -38.99187549,
-#                             -47.45770771,
-#                         ],
-#                         [
-#                             -19.76726066,
-#                             -25.7122143,
-#                             -31.54577612,
-#                             -37.38331695,
-#                             -47.02343727,
-#                         ],
-#                         [
-#                             -24.74325104,
-#                             -28.78696025,
-#                             -31.458494,
-#                             -36.00456711,
-#                             -46.93615515,
-#                         ],
-#                     ]
-#                 ),
-#                 "best_probs30:35": np.array(
-#                    [[-203.15859723, -208.79079415, -210.87179298,-210.56183994, -224.19464568],
-#  [-202.98538493, -218.12507661, -207.63966568, -215.93214396, -224.54198098],
-#  [-202.41118988, -214.63334729, -217.81262519, -221.14009604, -222.43579649],
-#  [-200.84257013,-209.87178653, -209.47192559, -216.62538661, -221.49910549],
-#  [-209.14430395, -215.02329713, -210.19587419, -213.92864354, -229.10658422]]
-#                 ),
-#                 "best_paths0:5": np.array(
-#                     [
-#                         [0, 11, 20, 25, 20],
-#                         [0, 11, 20, 25, 20],
-#                         [0, 11, 20, 25, 20],
-#                         [0, 11, 20, 25, 20],
-#                         [0, 11, 20, 25, 20],
-#                     ]
-#                 ),
-#                 "best_paths30:35": np.array(
-#                     [
-#                         [20, 19, 35, 11, 21],
-#                         [20, 19, 35, 11, 21],
-#                         [20, 19, 35, 11, 21],
-#                         [20, 19, 35, 11, 21],
-#                         [35, 19, 35, 11, 34],
-#                     ]
-#                 ),
-#             },
-#         }
-#     ]
-#         for test in test_cases:
-#             viterbi = Viterbi(vocab=self.vocab, tag_counts= self.tag_counts, 
-#                               transition_matrix=test["input"]["A"], emission_matrix=test["input"]["B"],
-#                               test_words=test["input"]["test_corpus"], y = self.y)
-#             viterbi._initialize()
-#             viterbi._forward()
-#             for range_ in test["expected"]:
-#                 get_index = list(range_[10:].split(":"))
-#                 index0 = int(get_index[0])
-#                 index1 = int(get_index[1])
-#                 if (range_[:10] == "best_probs"):
-#                     sub_best_probs = viterbi.best_probs[index0 : index1,  index0: index1]
-#                     np.testing.assert_almost_equal(sub_best_probs, test["expected"][range_],decimal=8
-#                                                    ,err_msg= "Wrong value of {}, expected {}, got {}".format(range_, test["expected"][range_], sub_best_probs))
-#                 else:
-#                     sub_best_paths = viterbi.best_paths[index0 : index1,  index0: index1]
-#                     np.testing.assert_almost_equal(sub_best_paths, test["expected"][range_],
-#                                      err_msg= "Wrong value of {}, expected {}, got {}".format(range_, test["expected"][range_], sub_best_paths))
+    def test_forward(self):
+        test_cases = [
+        {
+            "name": "default_check",
+            "input": {
+                "A": self.transition_matrix,
+                "B": self.emission_matrix,
+                "test_corpus": self.test_words,
+                "best_probs": np.load("./npy/best_probs.npy"),
+                "best_paths": 
+                    np.load("./npy/best_paths.npy"),
+                "vocab": self.vocab,
+                "verbose": False,
+            },
+            "expected": {
+                "best_probs0:5": np.array(
+                    [
+                        [
+                            -22.60982633,
+                            -24.78215633,
+                            -34.08246498,
+                            -34.34107105,
+                            -49.56012613,
+                        ],
+                        [
+                            -23.07660654,
+                            -24.51583896,
+                            -35.04774303,
+                            -35.28281026,
+                            -50.52540418,
+                        ],
+                        [
+                            -23.57298822,
+                            -29.98305064,
+                            -31.98004656,
+                            -38.99187549,
+                            -47.45770771,
+                        ],
+                        [
+                            -19.76726066,
+                            -25.7122143,
+                            -31.54577612,
+                            -37.38331695,
+                            -47.02343727,
+                        ],
+                        [
+                            -24.74325104,
+                            -28.78696025,
+                            -31.458494,
+                            -36.00456711,
+                            -46.93615515,
+                        ],
+                    ]
+                ),
+                "best_probs30:35": np.array(
+                   [[-203.15859723, -208.79079415, -210.87179298,-210.56183994, -224.19464568],
+ [-202.98538493, -218.12507661, -207.63966568, -215.93214396, -224.54198098],
+ [-202.41118988, -214.63334729, -217.81262519, -221.14009604, -222.43579649],
+ [-200.84257013,-209.87178653, -209.47192559, -216.62538661, -221.49910549],
+ [-209.14430395, -215.02329713, -210.19587419, -213.92864354, -229.10658422]]
+                ),
+                "best_paths0:5": np.array(
+                    [
+                        [0, 11, 20, 25, 20],
+                        [0, 11, 20, 25, 20],
+                        [0, 11, 20, 25, 20],
+                        [0, 11, 20, 25, 20],
+                        [0, 11, 20, 25, 20],
+                    ]
+                ),
+                "best_paths30:35": np.array(
+                    [
+                        [20, 19, 35, 11, 21],
+                        [20, 19, 35, 11, 21],
+                        [20, 19, 35, 11, 21],
+                        [20, 19, 35, 11, 21],
+                        [35, 19, 35, 11, 34],
+                    ]
+                ),
+            },
+        }
+    ]
+        for test in test_cases:
+            viterbi = Viterbi(vocab=self.vocab, tag_counts= self.tag_counts, 
+                              transition_matrix=test["input"]["A"], emission_matrix=test["input"]["B"],
+                              test_words=test["input"]["test_corpus"], y = self.y)
+            viterbi._initialize()
+            viterbi._forward()
+            for range_ in test["expected"]:
+                get_index = list(range_[10:].split(":"))
+                index0 = int(get_index[0])
+                index1 = int(get_index[1])
+                if (range_[:10] == "best_probs"):
+                    sub_best_probs = viterbi.best_probs[index0 : index1,  index0: index1]
+                    np.testing.assert_almost_equal(sub_best_probs, test["expected"][range_],decimal=8
+                                                   ,err_msg= "Wrong value of {}, expected {}, got {}".format(range_, test["expected"][range_], sub_best_probs))
+                else:
+                    sub_best_paths = viterbi.best_paths[index0 : index1,  index0: index1]
+                    np.testing.assert_almost_equal(sub_best_paths, test["expected"][range_],
+                                     err_msg= "Wrong value of {}, expected {}, got {}".format(range_, test["expected"][range_], sub_best_paths))
             
 
     def test_backward(self):
