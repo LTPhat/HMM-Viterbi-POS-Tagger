@@ -78,7 +78,7 @@ For example:
 
 ```sh
 python predict_new.py --training_corpus ./data/WSJ_02-21.pos --vocab_txt ./data/hmm_vocab.txt --alpha 0.001
---stn 'You just want attention. You dont want my heart.'
+--stn "When I see you face , there is not a thing that I could change . Because you are amazing , just the way you are." 
 ```
 
 Result:
@@ -86,8 +86,8 @@ Result:
 ```sh
 -------- YOUR SENTENCE TAGGING IS PROCESSING------------
 -------Received parser inputs completed-----------
-Sentence: ['You', 'just', 'want', 'attention.', 'You', 'dont', 'want', 'my', 'heart', '.']
-POS tags: ['PRP', 'RB', 'VB', 'JJ', 'PRP', 'VBZ', 'VB', 'PRP$', 'NN', '.']
+Sentence: ['When', 'I', 'see', 'you', 'face', ',', 'there', 'is', 'not', 'a', 'thing', 'that', 'I', 'could', 'change', '.', 'Because', 'you', 'are', 'amazing', ',', 'just', 'the', 'way', 'you', 'are', '.']
+POS tags: ['WRB', 'PRP', 'VBP', 'PRP', 'VBP', ',', 'EX', 'VBZ', 'RB', 'DT', 'NN', 'IN', 'PRP', 'MD', 'VB', '.', 'IN', 'PRP', 'VBP', 'JJ', ',', 'RB', 'DT', 'NN', 'PRP', 'VBP', '.']
 ```
 
 ``Alternatively for Linux``: Train, test and getting tags for new sentence automatically by setting arguments in ``script.sh``:
