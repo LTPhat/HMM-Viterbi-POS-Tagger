@@ -46,7 +46,7 @@ def init_argparse():
     parser = argparse.ArgumentParser(
         prog= "Predict new sentence",
         usage="%(prog)s --training_corpus '.data/WSJ_02-21.pos' --vocab_txt './data/hmm_vocab.txt' --alpha 0.001 --stn 'Your sentence' ",
-        description=
+        description="--training_corpus: Training corpus .pos file, please Enter this: ./data/WSJ_02-21.pos"
                     "--vocab_txt: Vocab txt file to refer. There are 5k vocab (./data/WordList_TOEFL.txt); 20k vocab (./data/hmm_vocab.txt); 60k vocab (./data/COCA60000_vocab.txt); 500k vocab (./data/vocab.txt). Choose one of these. \n"
                     "--alpha: Laplacian smoothing coefficient of HMM model. Alpha = 0.001 (default)"
                     "--stn: Your new sentence to predict tags"

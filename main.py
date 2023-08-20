@@ -56,7 +56,7 @@ def check_valid_input(args):
 
 
 def main():
-    print("-------- PARSER ...")
+    print("-------- ARGUMENT PARSER------------")
     parser = init_argparse()
     args   = parser.parse_args()
     if not check_valid_input(args=args):
