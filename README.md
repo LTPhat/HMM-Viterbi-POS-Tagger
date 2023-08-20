@@ -65,7 +65,7 @@ python main.py --training_corpus [training_corpus] --vocab_txt [vocab_txt] --tes
 
 For example:
 ```sh
---training_corpus './data/WSJ_02-21.pos' --vocab_txt './data/hmm_vocab.txt' --test_corpus './data/WSJ_24.pos' --alpha 0.001
+python main.py --training_corpus './data/WSJ_02-21.pos' --vocab_txt './data/hmm_vocab.txt' --test_corpus './data/WSJ_24.pos' --alpha 0.001
 ```
 ## Inference
 
