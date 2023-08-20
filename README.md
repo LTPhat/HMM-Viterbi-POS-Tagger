@@ -100,7 +100,7 @@ POS tags: ['WRB', 'PRP', 'VBP', 'PRP', 'VBP', ',', 'EX', 'VBZ', 'RB', 'DT', 'NN'
 
 python main.py --training_corpus './data/WSJ_02-21.pos' --vocab_txt './data/hmm_vocab.txt' --test_corpus './data/WSJ_24.pos' --alpha 0.001
 
-python predict_new.py --training_corpus "./data/WSJ_02-21.pos" --vocab_txt "./data/hmm_vocab.txt" --alpha 0.001 --stn "You just want attention. You dont want my heart."
+python predict_new.py --training_corpus "./data/WSJ_02-21.pos" --vocab_txt "./data/hmm_vocab.txt" --alpha 0.001 --stn "When I see you face , there is not a thing that I could change . Because you are amazing , just the way you are." 
 ```
 Then, run this bash shell file:
 
