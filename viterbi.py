@@ -55,21 +55,13 @@ class Viterbi(object):
         num_tags = len(self.tag_counts)
         # Traverse each word in test_words from 1, because index 0 is assigned for start_token 
         for i in range(1, len(self.test_words)):
+
             # Print number of words processed, every 5000 words
             if i % 5000 == 0 and verbose:
                 print("Words processed: {:>8}".format(i))
+
             # Traverse each num_tag at column i
             for j in range(num_tags):
-                # # Normal
-                # best_prob = -float("inf")
-                # best_path = 0       
-                # # Traverse each num_tag at column i - 1
-                # for k in range(num_tags):
-                #     prob = self.best_probs[k, i - 1] + math.log(self.transition_matrix[k, j]) + math.log(self.emission_matrix[j, self.vocab[self.test_words[i]]])
-                #     # Update best_prob
-                #     if prob > best_prob:
-                #         best_prob = prob
-                #         best_path = k
                 # Vectorization (speed up x5)
                 prob_vector_i = self.best_probs[:, i - 1] + np.log(self.transition_matrix[:, j]) +  np.log(self.emission_matrix[j, self.vocab[self.test_words[i]]]) * np.ones((num_tags, 1))
                 best_prob = np.max(prob_vector_i)
@@ -77,8 +69,6 @@ class Viterbi(object):
                 
                 self.best_probs[j, i] = best_prob
                 self.best_paths[j, i] = best_path
-            # if i == 4:
-            #     break
 
         return self.best_probs, self.best_paths
     
@@ -152,10 +142,5 @@ if __name__ == "__main__":
     pred = viterbi._backward()
     print("Completed viterbi backward ...")
     print("Accuracy on test_words is: {}".format(viterbi._calculate_accuracy()))
-    print(len(pred))
-    print(len(viterbi.test_words))
-    print(test_words[-10:])
-    print(pred[-10:])
-    print(pred[-10:-1])
 
     

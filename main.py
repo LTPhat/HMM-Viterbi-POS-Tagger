@@ -17,8 +17,8 @@ test_corpus_list = ["./data/WSJ_23.pos", "./data/WSJ_24.pos"]
 
 def init_argparse():
     parser = argparse.ArgumentParser(
-        prog= "Running POS-TAGGING with Hidden Markow Model",
-        usage="%(prog)s --training_corpus './data/WSJ_02-21.pos' --vocab_txt './data/hmm_vocab.txt' --test_corpus './data/WSJ_24.pos' --alpha 0.001",
+        prog= "Viterbi POS-TAGGER",
+        usage="%(prog)s example CLI: --training_corpus './data/WSJ_02-21.pos' --vocab_txt './data/hmm_vocab.txt' --test_corpus './data/WSJ_24.pos' --alpha 0.001",
         description="--training_corpus: Training corpus. Choose ./data/WSJ_02-21.pos \n"
                     "--vocab_txt: Vocab txt file in data folder. There are 5k vocab (./data/WordList_TOEFL.txt); 20k vocab (./data/hmm_vocab.txt); 60k vocab (./data/COCA60000_vocab.txt); 500k vocab (./data/vocab.txt). Choose one of these. \n"
                     "--test_corpus: Choose one of these: ./data/WSJ_23.pos, ./data/WSJ_24.pos \n"

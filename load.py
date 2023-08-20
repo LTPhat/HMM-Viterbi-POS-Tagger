@@ -26,8 +26,5 @@ def get_index_vocab(vocab_txt, verbose = True):
     if verbose:       
         print("Vocabulary dictionary which length of {} is created!".format(len(vocab)))
     return vocab
-if __name__ == "__main__":
-    vocab = get_index_vocab("./data/COCA60000.txt")
-    print(len(set(vocab)))
 
 

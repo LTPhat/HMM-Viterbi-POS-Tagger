@@ -92,31 +92,3 @@ class HMM(object):
         print(transition)
         print(emission)
     
-
-
-if __name__ == "__main__":
-
-    # unittest.main(verbosity=2)
-    vocab_txt = "./data/hmm_vocab.txt"
-    vocab = get_index_vocab(vocab_txt=vocab_txt)
-    training_corpus = get_training_corpus("./data/WSJ_02-21.pos")
-    hmm = HMM(training_corpus=training_corpus, vocab=vocab, alpha=0.001)
-    hmm._create_counts()
-    A = hmm._create_transition_matrix()
-    B  = hmm._create_emission_matrix()
-    print(B[0:5, 0:5])
-    # cidx  = ['725','adroitly','engineers', 'promoted', 'synergy']
-
-    # # Get the integer ID for each word
-    # cols = [hmm.vocab[a] for a in cidx]
-
-    # # Choose POS tags to show in a sample dataframe
-    # rvals =['CD','NN','NNS', 'VB','RB','RP']
-
-    # # For each POS tag, get the row number from the 'states' list
-    # rows = [hmm.states.index(a) for a in rvals]
-    # B_sub = pd.DataFrame(B[np.ix_(rows,cols)], index=rvals, columns = cidx )
-    # print(B_sub)
-    # print(f"View Matrix position at row 0, column 0: {B[0,0]:.9f}")
-    # print(f"View Matrix position at row 3, column 1: {B[3,1]:.9f}")
-    # Testing your function
