@@ -107,7 +107,7 @@ Then, run this bash shell file:
 ```sh
 bash script.sh
 ```
-## Experiment
+## Experiments
 
 **Alpha = 1**
 
