@@ -9,6 +9,10 @@ import pandas as pd
 class HMM(object):
     def __init__(self, vocab, training_corpus, alpha):
         """
+        vocab: Vocabulary dictionary
+        training_corpus: training corpus
+        alpha: Laplacian smoothing coefficient
+        
         emission_counts: maps (tag, word) to the number of times it happened.
         transition_counts[(prev_tag, tag)]: maps (prev_tag, tag) to the number of times it has appeared.
         tag_counts[(tag, word)]: maps (tag) to the number of times it has occured.

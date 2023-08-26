@@ -12,27 +12,30 @@ import pandas as pd
 class Viterbi(object):
     def __init__(self, vocab, tag_counts, transition_matrix, emission_matrix, test_words, y):
         """
-        vocab_txt: Vocabulary txt file
+        vocab: Vocabulary dictionary
         tag_counts: Dict of tag_counts (like HMM class)
         transition matrix: transition matrix of HMM class
         emission matrix: emission matrix of HMM class
-        test_words: test words after preprocessing 
+        test_words: test words after preprocessing
+        y: label of test_words
         """
         self.vocab = vocab
         self.tag_counts = tag_counts
         self.transition_matrix = transition_matrix
         self.emission_matrix = emission_matrix
         self.test_words = test_words
+        self.y = y
+
         # Inner attributes 
         """
         states: List of all possible tags
-        test_word: file of test words (.words) after remove true labels
+        best_probs: Best_probs matrix, shape (tags, words)
+        best_paths: Best path matrix, shape (tags, words)
         """
         self.states = sorted(self.tag_counts.keys())
         self.best_probs = np.zeros((len(self.tag_counts), len(self.test_words)))     
         self.best_paths = np.zeros((len(self.tag_counts), len(self.test_words)), dtype = int)
         self.pred = [None] * (len(self.test_words) + 1)
-        self.y = y
 
 
     def _initialize(self):
@@ -74,6 +77,9 @@ class Viterbi(object):
     
     
     def _backward(self):
+        """
+        Retrieve tags from best_paths matrix
+        """
         n = self.best_paths.shape[1]
         # Array z store the decision of each colummn
         z = [None] * (n + 1)

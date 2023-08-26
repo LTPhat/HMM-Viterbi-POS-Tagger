@@ -9,18 +9,25 @@ from viterbi import Viterbi
 from process_test_corpus import *
 import argparse
 from main import vocab_txt_list
-
+import re
 
 
 def process_new_stn(vocab, new_sentence):
+    """
+    Preprocess new sentence
+    """
+    test_words = []
     # Remove white space at head and tail
     new_sentence = new_sentence.strip()
-    if new_sentence[-1] == ".":
-        # Tokenize
-        test_words = new_sentence[:-1].split(" ")
-        test_words.append(new_sentence[-1])
-    else: 
-        test_words = new_sentence.split(" ")
+    # Split into word (maybe include word ending with punctuation)
+    words_with_punctuation = re.findall(r'\w+|[^\w\s]+', new_sentence)
+    for item in words_with_punctuation:
+        # If got punctuation
+        if re.search(r'[^\w\s]+$', item):
+            if len(item) != 1:
+                # Just get one punctuation
+                item = item[0]
+        test_words.append(item)
     # Out of vocab preprocess
     org_test_words, test_words = preprocess_list(vocab=vocab, test_words_list=test_words)
     return org_test_words, test_words
