@@ -78,7 +78,7 @@ For example:
 
 ```sh
 python predict_new.py --training_corpus ./data/WSJ_02-21.pos --vocab_txt ./data/hmm_vocab.txt --alpha 0.001
---stn "When I see you face , there is not a thing that I could change . Because you are amazing , just the way you are." 
+--stn "When I see you face, there is not a thing that I could change. Because you are amazing, just the way you are." 
 ```
 
 Result:
